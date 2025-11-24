@@ -3,51 +3,55 @@ import os
 import json
 from pathlib import Path
 from ultralytics import YOLO
-from fastapi import UploadFile, File, HTTPException, Body
+from fastapi import UploadFile, File, HTTPException
 from pydantic import BaseModel, Field
 import numpy as np
 import cv2
 
-# --- CONFIGURACIÓN GLOBAL DE ARTEFACTOS ---
-ONNX_PATH = Path("artifacts/model.onnx")
-PT_PATH = Path("artifacts/model_best.pt")
-CLASSES_PATH = Path("artifacts/classes.json")
+ARTIFACTS_DIR = Path("./artifacts")
+ONNX_PATH = ARTIFACTS_DIR / "model.onnx"
+PT_PATH = ARTIFACTS_DIR / "best.pt"
+
+IMGSZ = 896
+CONF_TH = 0.25 
+IOU_TH = 0.45 
+DEVICE = 'cpu'
+
+MODEL = None
+CLASSES_META = {"names": ["error"]} 
 
 try:
-    MODEL = None
-
     if ONNX_PATH.exists():
         try:
             MODEL = YOLO(str(ONNX_PATH)) 
-            print(" Modelo cargado: ONNX para inferencia rápida.")
+            print("Modelo cargado: ONNX para inferencia rápida.")
         except Exception as e:
-            print(f" Fallo fatal al cargar ONNX: {e}. Intentando con PyTorch (.pt)...")
+            print(f"Fallo al cargar ONNX: {e}. Intentando con PyTorch (.pt)...")
             MODEL = None
-            
+
     if MODEL is None and PT_PATH.exists():
         try:
-            MODEL = YOLO(str(PT_PATH))
-            print(" Modelo cargado: PyTorch (.pt).")
+            MODEL = YOLO(str(PT_PATH), device=DEVICE)
+            print("Modelo cargado: PyTorch (.pt) forzado a CPU.")
         except Exception as e:
-            print(f" Fallo al cargar PT: {e}")
+            print(f"Fallo al cargar PT: {e}")
             MODEL = None
 
     if MODEL is None:
         raise FileNotFoundError("Ningún artefacto de modelo válido pudo ser cargado.")
     
-    with open(CLASSES_PATH, "r") as f:
-        CLASSES_META = json.load(f)
+    CLASSES_META['names'] = MODEL.names
+    
+    assert len(CLASSES_META['names']) == 17, f"Error: Modelo cargado con {len(CLASSES_META['names'])} clases, se esperaban 17."
 
-    assert len(CLASSES_META['names']) == 17, "Error: La lista de nombres de clase no tiene 17 elementos."
 
-except FileNotFoundError as e:
+except Exception as e:
     MODEL = None
     CLASSES_META = {"names": ["error"]}
-    print(f" Error al iniciar la API: {e}")
+    print(f" Error FATAL al iniciar la API: {e}")
     print("La API se iniciará, pero /predict fallará (Error 503).")
 
 
-# --- ESQUEMAS PYDANTIC DE RESPUESTA ---
 class Detection(BaseModel):
     box: list[float] = Field(description="[x_min, y_min, x_max, y_max] en píxeles")
     confidence: float = Field(description="Confianza de la detección")
@@ -59,13 +63,12 @@ class PredictionResponse(BaseModel):
     num_detections: int
     detections: list[Detection]
 
-
 app = fastapi.FastAPI()
 
 @app.get("/health", status_code=200)
 async def get_health() -> dict:
     if MODEL is None:
-        raise HTTPException(status_code=503, detail="Model artifact missing.")
+        raise HTTPException(status_code=503, detail="Model artifact missing or failed to load.")
         
     return {
         "status": "model_loaded",
@@ -89,14 +92,14 @@ async def post_predict(file: UploadFile = File(...)) -> PredictionResponse:
         
         results_list = MODEL.predict(
             source=img_bgr, 
-            conf=0.25, 
-            iou=0.45,       
-            imgsz=896,      
+            conf=CONF_TH, 
+            iou=IOU_TH, 
+            imgsz=IMGSZ, 
             verbose=False
         )
         
     except Exception as e:
-        print(f"Error during image processing or YOLO inference: {e}")
+        print(f"Error durante image processing or YOLO inference: {e}")
         raise HTTPException(status_code=500, detail="Inference failed after image decoding.")
 
     detections = []
@@ -112,16 +115,15 @@ async def post_predict(file: UploadFile = File(...)) -> PredictionResponse:
             num_classes = len(CLASSES_META['names']) 
             
             for box, conf, cls_id in zip(boxes, confidences, class_ids):
-                    
-                    if 0 <= cls_id < num_classes:
-                        detections.append(Detection(
-                            box=box.tolist(),
-                            confidence=float(conf),
-                            class_id=int(cls_id),
-                            class_name=CLASSES_META['names'][cls_id]
-                        ))
-                    else:
-                        print(f"DEBUG: Ignorando detección con cls_id fuera de rango: {cls_id}")
+                
+                if 0 <= cls_id < num_classes:
+                    detections.append(Detection(
+                        box=box.tolist(),
+                        confidence=float(conf),
+                        class_id=int(cls_id),
+                        class_name=CLASSES_META['names'][cls_id]
+                    ))
+
 
     return PredictionResponse(
         status="success",
