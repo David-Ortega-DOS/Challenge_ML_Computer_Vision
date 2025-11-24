@@ -1,5 +1,6 @@
 # syntax=docker/dockerfile:1.2
-FROM python:latest
+FROM python:3.10-slim
+FROM pytorch/pytorch:2.0.1-cuda11.7-cudnn8-runtime
 
 WORKDIR /app
 
@@ -15,4 +16,4 @@ ENV PORT 8080
 
 # Comando para iniciar la API usando Uvicorn
 # El flag --host 0.0.0.0 es necesario para que sea accesible dentro del contenedor.
-CMD ["uvicorn", "challenge.api:app", "--host", "0.0.0.0", "--port", "8080"]
+CMD uvicorn challenge.api:app --host 0.0.0.0 --port $PORT

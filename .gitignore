@@ -1,6 +1,5 @@
 data/
 .venv/
 runs/
-.verify_inference.py
 .coverage
 __pycache__/
