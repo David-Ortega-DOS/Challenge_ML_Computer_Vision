@@ -3,3 +3,6 @@ data/
 runs/
 .coverage
 __pycache__/
+yolo11m.onnx
+yolo11m.pt
+yolo11m.onnx.data
