@@ -38,6 +38,8 @@ try:
     with open(CLASSES_PATH, "r") as f:
         CLASSES_META = json.load(f)
 
+    assert len(CLASSES_META['names']) == 17, "Error: La lista de nombres de clase no tiene 17 elementos."
+
 except FileNotFoundError as e:
     MODEL = None
     CLASSES_META = {"names": ["error"]}
