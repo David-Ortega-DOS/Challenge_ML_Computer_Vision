@@ -108,14 +108,20 @@ async def post_predict(file: UploadFile = File(...)) -> PredictionResponse:
             boxes = results.boxes.xyxy.cpu().numpy()
             confidences = results.boxes.conf.cpu().numpy()
             class_ids = results.boxes.cls.cpu().numpy().astype(int)
+
+            num_classes = len(CLASSES_META['names']) 
             
             for box, conf, cls_id in zip(boxes, confidences, class_ids):
-                detections.append(Detection(
-                    box=box.tolist(), 
-                    confidence=float(conf),
-                    class_id=int(cls_id),
-                    class_name=CLASSES_META['names'][cls_id]
-                ))
+                    
+                    if 0 <= cls_id < num_classes:
+                        detections.append(Detection(
+                            box=box.tolist(),
+                            confidence=float(conf),
+                            class_id=int(cls_id),
+                            class_name=CLASSES_META['names'][cls_id]
+                        ))
+                    else:
+                        print(f"DEBUG: Ignorando detección con cls_id fuera de rango: {cls_id}")
 
     return PredictionResponse(
         status="success",
