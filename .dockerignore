@@ -1,0 +1,22 @@
+# Ignorar datos del dataset (archivos grandes)
+data/
+
+# Ignorar el entorno virtual de Python
+.venv/
+__pycache__/
+.pytest_cache
+
+
+# Ignorar archivos del git
+.git/
+
+# Ignorar carpetas de resultados de entrenamiento (archivos grandes)
+runs/
+
+docs/
+reports/
+tests/
+workflows/
+.coverage
+.verify_inference.py
+yolo11n.pt

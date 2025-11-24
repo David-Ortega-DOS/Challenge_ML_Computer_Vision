@@ -3,22 +3,27 @@ import glob
 import yaml
 import random
 import pytest
+from pathlib import Path
 
-DATA_YAML_PATH = "../data/data.yaml"
+PROJECT_ROOT = Path(__file__).parent.parent 
+DATA_YAML_PATH = PROJECT_ROOT / "data" / "data.yaml"
 
 
 def _load_data_cfg():
-    assert os.path.exists(DATA_YAML_PATH)
+    assert DATA_YAML_PATH.exists(), f"data.yaml no encontrado en {DATA_YAML_PATH.resolve()}"
     with open(DATA_YAML_PATH, "r") as f:
         return yaml.safe_load(f)
 
 
 def _collect_split_images(img_dir: str):
+    full_img_dir = PROJECT_ROOT / img_dir
+    if not full_img_dir.is_dir():
+        print(f"DEBUG: Directorio no encontrado: {full_img_dir}")
+        return []
     paths = []
     for ext in ("*.jpg", "*.jpeg", "*.png", "*.bmp"):
-        paths.extend(glob.glob(os.path.join(img_dir, ext)))
+        paths.extend(glob.glob(str(full_img_dir / ext)))
     return sorted(paths)
-
 
 def _img_to_label(img_path: str) -> str:
     lbl = img_path.replace(os.sep + "images" + os.sep, os.sep + "labels" + os.sep)
@@ -44,6 +49,10 @@ def test_images(data_cfg):
     assert imgs
     k = int(os.environ.get("TEST_SAMPLE_SIZE", 6))
     random.seed(7)
+
+    ##DEBUG
+    selected_images = random.sample(imgs, min(k, len(imgs)))
+    print(f"\n[DEBUG] Imagen de Prueba Clave: {selected_images[0]}")
     return random.sample(imgs, min(k, len(imgs)))
 
 
