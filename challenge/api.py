@@ -18,7 +18,7 @@ try:
 
     if ONNX_PATH.exists():
         try:
-            MODEL = YOLO(str(ONNX_PATH), imgsz=896) 
+            MODEL = YOLO(str(ONNX_PATH)) 
             print(" Modelo cargado: ONNX para inferencia rápida.")
         except Exception as e:
             print(f" Fallo fatal al cargar ONNX: {e}. Intentando con PyTorch (.pt)...")
