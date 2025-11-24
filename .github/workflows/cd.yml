@@ -1,19 +1,21 @@
 name: 'Continuous Delivery'
 
+name: CD / Deploy a Google Cloud Run
+
 on:
   push:
     branches:
       - main
 
 jobs:
+
   deploy:
     runs-on: ubuntu-latest
-    
-    needs: test
     
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+
 
     - name: Autenticar con Google Cloud
       id: auth
@@ -21,26 +23,31 @@ jobs:
       with:
         credentials_json: ${{ secrets.GCP_SERVICE_ACCOUNT_KEY }}
         
+
     - name: Configurar Proyecto GCP y Docker
       run: |
         gcloud config set project ${{ secrets.GCP_PROJECT_ID }}
         gcloud auth configure-docker gcr.io
         
+
     - name: Definir variables de imagen
       id: vars
       run: |
+        # Nombra la imagen usando el ID del proyecto y el nombre del servicio
         IMAGE_NAME="gcr.io/${{ secrets.GCP_PROJECT_ID }}/${{ secrets.SERVICE_NAME }}"
         echo "image_name=$IMAGE_NAME" >> $GITHUB_OUTPUT
         
+
     - name: Construir y Subir Imagen Docker
       run: |
-        # Construye la imagen con un tag de version (SHA)
+        # Usa el SHA del commit como tag para el versionamiento inmutable
         docker build -t ${{ steps.vars.outputs.image_name }}:${{ github.sha }} .
         docker push ${{ steps.vars.outputs.image_name }}:${{ github.sha }}
-        # Etiqueta la misma imagen como 'latest' para el despliegue
+        # También taguea como 'latest' para el despliegue
         docker tag ${{ steps.vars.outputs.image_name }}:${{ github.sha }} ${{ steps.vars.outputs.image_name }}:latest
         docker push ${{ steps.vars.outputs.image_name }}:latest
         
+
     - name: Desplegar a Cloud Run
       uses: google-github-actions/deploy-cloudrun@v2
       with:
