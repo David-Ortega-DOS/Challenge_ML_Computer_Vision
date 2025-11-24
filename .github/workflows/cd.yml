@@ -1,7 +1,5 @@
 name: 'Continuous Delivery'
 
-name: CD / Deploy a Google Cloud Run
-
 on:
   push:
     branches:
