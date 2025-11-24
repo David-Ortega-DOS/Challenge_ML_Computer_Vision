@@ -8,9 +8,9 @@ from pydantic import BaseModel, Field
 import numpy as np
 import cv2
 
-ARTIFACTS_DIR = Path("./artifacts")
-ONNX_PATH = ARTIFACTS_DIR / "model.onnx"
-PT_PATH = ARTIFACTS_DIR / "best.pt"
+ROOT_DIR = Path(__file__).resolve().parent.parent
+ONNX_PATH = ROOT_DIR / "artifacts" / "model.onnx"
+PT_PATH = ROOT_DIR / "artifacts" / "model_best.pt"
 
 IMGSZ = 896
 CONF_TH = 0.25 
