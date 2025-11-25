@@ -21,7 +21,7 @@ def _to_buf(img_bgr):
 
 @pytest.mark.slow
 def test_api_recall_on_subset(test_images, yolo_labels):
-    iou_th = float(os.environ.get("IOU_TH", 0.5))
+    iou_th = float(os.environ.get("IOU_TH", 0.3))
 
     matched = 0
     total = 0

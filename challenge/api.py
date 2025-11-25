@@ -13,8 +13,8 @@ ONNX_PATH = ROOT_DIR / "artifacts" / "model.onnx"
 PT_PATH = ROOT_DIR / "artifacts" / "model_best.pt"
 
 IMGSZ = 896
-CONF_TH = 0.25 
-IOU_TH = 0.45 
+CONF_TH = 0.10 
+IOU_TH = 0.3 
 DEVICE = 'cpu'
 
 MODEL = None
