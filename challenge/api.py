@@ -26,25 +26,33 @@ print(f"[DEBUG] Ruta PT_PATH: {PT_PATH}")
 print(f"[DEBUG] Dispositivo configurado: {DEVICE}")
 
 try:
-    if ONNX_PATH.exists():
-        print(f"[DEBUG] Intentando cargar modelo ONNX desde {ONNX_PATH}")
-        try:
-            MODEL = YOLO(str(ONNX_PATH)) 
-            print("Modelo cargado: ONNX para inferencia rápida.")
-        except Exception as e:
-            print(f"Fallo al cargar ONNX: {e}. Intentando con PyTorch (.pt)...")
-            MODEL = None
-    else:
-        print("[DEBUG] Archivo ONNX no encontrado.")
+    # if ONNX_PATH.exists():
+    #     print(f"[DEBUG] Intentando cargar modelo ONNX desde {ONNX_PATH}")
+    #     try:
+    #         MODEL = YOLO(str(ONNX_PATH)) 
+    #         print("Modelo cargado: ONNX para inferencia rápida.")
+    #     except Exception as e:
+    #         print(f"Fallo al cargar ONNX: {e}. Intentando con PyTorch (.pt)...")
+    #         MODEL = None
+    # else:
+    #     print("[DEBUG] Archivo ONNX no encontrado.")
 
-    if MODEL is None and PT_PATH.exists():
-        print(f"[DEBUG] Intentando cargar modelo PyTorch desde {PT_PATH}")
+    # if MODEL is None and PT_PATH.exists():
+    #     print(f"[DEBUG] Intentando cargar modelo PyTorch desde {PT_PATH}")
+    #     try:
+    #         MODEL = YOLO(str(PT_PATH), device=DEVICE)
+    #         print("Modelo cargado: PyTorch (.pt) forzado a CPU.")
+    #     except Exception as e:
+    #         print(f"Fallo al cargar PT: {e}")
+    #         MODEL = None
+    if PT_PATH.exists():
         try:
-            MODEL = YOLO(str(PT_PATH), device=DEVICE)
+            MODEL = YOLO(str(PT_PATH), device='cpu') # Forzar CPU
             print("Modelo cargado: PyTorch (.pt) forzado a CPU.")
         except Exception as e:
-            print(f"Fallo al cargar PT: {e}")
+            print(f" Fallo al cargar PT: {e}")
             MODEL = None
+
     elif MODEL is None:
         print("[DEBUG] Archivo PyTorch (.pt) no encontrado.")
 
