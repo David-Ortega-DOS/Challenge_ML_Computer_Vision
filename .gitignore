@@ -6,3 +6,5 @@ __pycache__/
 yolo11m.onnx
 yolo11m.pt
 yolo11m.onnx.data
+veity.py
+pytest.ini

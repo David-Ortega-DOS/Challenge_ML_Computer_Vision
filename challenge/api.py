@@ -47,10 +47,17 @@ try:
     #         MODEL = None
     if PT_PATH.exists():
         try:
-            MODEL = YOLO(str(PT_PATH), device='cpu') # Forzar CPU
+            MODEL = YOLO(str(PT_PATH)) 
             print("Modelo cargado: PyTorch (.pt) forzado a CPU.")
         except Exception as e:
-            print(f" Fallo al cargar PT: {e}")
+            print(f"Fallo al cargar PT: {e}")
+            MODEL = None
+    if MODEL is None and ONNX_PATH.exists():
+        try:
+            MODEL = YOLO(str(ONNX_PATH)) 
+            print("Modelo cargado: ONNX para inferencia rápida (FALLBACK).")
+        except Exception as e:
+            print(f"Fallo al cargar ONNX: {e}. Descartando modelo ONNX.")
             MODEL = None
 
     elif MODEL is None:
