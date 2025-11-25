@@ -53,6 +53,11 @@ def test_images(data_cfg):
     ##DEBUG
     selected_images = random.sample(imgs, min(k, len(imgs)))
     print(f"\n[DEBUG] Imagen de Prueba Clave: {selected_images[0]}")
+
+    # Generar la etiqueta correspondiente a la imagen de prueba clave
+    test_label = _img_to_label(selected_images[0])
+    print(f"[DEBUG] Etiqueta de Prueba Clave: {test_label}")
+
     return random.sample(imgs, min(k, len(imgs)))
 
 

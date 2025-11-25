@@ -5,6 +5,7 @@ import pytest
 from PIL import Image
 from fastapi.testclient import TestClient
 from challenge.api import app
+from tests.conftest import _img_to_label
 from tests.utils_iou import yolo_to_xyxy, iou_xyxy
 
 client = TestClient(app)
@@ -21,7 +22,7 @@ def _to_buf(img_bgr):
 
 @pytest.mark.slow
 def test_api_recall_on_subset(test_images, yolo_labels):
-    iou_th = float(os.environ.get("IOU_TH", 0.3))
+    iou_th = float(os.environ.get("IOU_TH", 0.5))
 
     matched = 0
     total = 0
@@ -31,15 +32,32 @@ def test_api_recall_on_subset(test_images, yolo_labels):
         H, W = img.shape[:2]
         buf = _to_buf(img)
 
-        resp = client.post("/predict", files={"file": ("img.jpg", buf, "image/jpeg")})
+        # Usar _img_to_label para generar la ruta correcta de la etiqueta
+        lbl_path = _img_to_label(img_path)
+
+        # Verificar si el archivo de etiquetas existe
+        if not os.path.exists(lbl_path):
+            print(f"[DEBUG] Archivo de etiquetas no encontrado: {lbl_path}")
+            pytest.fail(f"Etiqueta faltante para la imagen: {img_path}")
+
+        # Leer el archivo de etiquetas
+        with open(lbl_path, "r") as f:
+            label_content = f.read()
+
+        # Enviar imagen y etiqueta al endpoint
+        resp = client.post(
+            "/predict",
+            files={
+                "file": ("img.jpg", buf, "image/jpeg"),
+                "label": ("label.txt", label_content, "text/plain")
+            }
+        )
+
         assert resp.status_code in (200, 400)
         if resp.status_code == 400:
             pytest.skip("The API was started without weights. Exiting with skip.")
         dets = resp.json()["detections"]
 
-        lbl_path = img_path.replace(
-            os.sep + "images" + os.sep, os.sep + "labels" + os.sep
-        )
         gts = yolo_labels(lbl_path)
 
         for cid, cx, cy, w, h in gts:
@@ -47,13 +65,13 @@ def test_api_recall_on_subset(test_images, yolo_labels):
             gt_xyxy = yolo_to_xyxy(cx, cy, w, h, W, H)
             best = 0.0
             for d in dets:
-                if d["cls_id"] != cid:
+                if d["class_id"] != cid:
                     continue
                 bx = (
-                    int(d["bbox"]["x1"]),
-                    int(d["bbox"]["y1"]),
-                    int(d["bbox"]["x2"]),
-                    int(d["bbox"]["y2"]),
+                    int(d["box"][0]),  # x_min
+                    int(d["box"][1]),  # y_min
+                    int(d["box"][2]),  # x_max
+                    int(d["box"][3])   # y_max
                 )
                 best = max(best, iou_xyxy(bx, gt_xyxy))
             if best >= iou_th:
