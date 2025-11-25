@@ -28,5 +28,12 @@ jobs:
         pip install -r requirements-docker.txt
         pip install -r requirements-test.txt
 
+    - name: Verificar artefactos del modelo
+      run: |
+        if [ ! -f artifacts/model.onnx ] && [ ! -f artifacts/model_best.pt ]; then
+          echo "Error: Los artefactos del modelo no están disponibles."
+          exit 1
+        fi
+
     - name: Ejecutar Pruebas (make api-test)
       run: make api-test

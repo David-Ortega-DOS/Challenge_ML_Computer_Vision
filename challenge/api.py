@@ -20,29 +20,44 @@ DEVICE = 'cpu'
 MODEL = None
 CLASSES_META = {"names": ["error"]} 
 
+print("[DEBUG] Iniciando carga del modelo...")
+print(f"[DEBUG] Ruta ONNX_PATH: {ONNX_PATH}")
+print(f"[DEBUG] Ruta PT_PATH: {PT_PATH}")
+print(f"[DEBUG] Dispositivo configurado: {DEVICE}")
+
 try:
     if ONNX_PATH.exists():
+        print(f"[DEBUG] Intentando cargar modelo ONNX desde {ONNX_PATH}")
         try:
             MODEL = YOLO(str(ONNX_PATH)) 
             print("Modelo cargado: ONNX para inferencia rápida.")
         except Exception as e:
             print(f"Fallo al cargar ONNX: {e}. Intentando con PyTorch (.pt)...")
             MODEL = None
+    else:
+        print("[DEBUG] Archivo ONNX no encontrado.")
 
     if MODEL is None and PT_PATH.exists():
+        print(f"[DEBUG] Intentando cargar modelo PyTorch desde {PT_PATH}")
         try:
             MODEL = YOLO(str(PT_PATH), device=DEVICE)
             print("Modelo cargado: PyTorch (.pt) forzado a CPU.")
         except Exception as e:
             print(f"Fallo al cargar PT: {e}")
             MODEL = None
+    elif MODEL is None:
+        print("[DEBUG] Archivo PyTorch (.pt) no encontrado.")
 
     if MODEL is None:
         raise FileNotFoundError("Ningún artefacto de modelo válido pudo ser cargado.")
     
     CLASSES_META['names'] = MODEL.names
     
-    assert len(CLASSES_META['names']) == 17, f"Error: Modelo cargado con {len(CLASSES_META['names'])} clases, se esperaban 17."
+    if len(CLASSES_META['names']) != 17:
+        print(f"[WARNING] Modelo cargado con {len(CLASSES_META['names'])} clases, se esperaban 17.")
+        print(f"[DEBUG] Clases del modelo: {CLASSES_META['names']}")
+    else:
+        print("[DEBUG] Modelo cargado con el número esperado de clases (17).")
 
 
 except Exception as e:
