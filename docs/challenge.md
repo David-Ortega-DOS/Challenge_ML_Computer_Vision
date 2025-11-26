@@ -174,11 +174,15 @@ Se implementó el **pipeline** de CI/CD para automatizar pruebas y despliegue.
 
 # Prueba de Ejecución 
 
-1. En el siguiente video se muestra como se realiza la ejecución del API desplejada. Se obtiene el marcador del "forklift" que se encontraba en la imagen.
+1. En la siguente imagen se muestra como el API reconoce exitosamente los marcadores correspondientes a "forklift" y "person"
 
-- [![Vista Previa del Video 1](https://github.com/David-Ortega-DOS/Challenge_ML_Computer_Vision/blob/main/docs/img/video1.png)](https://drive.google.com/file/d/1xXk-sySnZm4y49EsCp1UZmXdoHEo1BPN/view?usp=drive_link)
+![Gráfico del post predic ](https://github.com/David-Ortega-DOS/Challenge_ML_Computer_Vision/blob/main/docs/img/post_predict.png)
+
+2. En el siguiente video (hacer click en la imagen) se muestra como se realiza la ejecución del API desplejada. Se obtiene el marcador del "forklift" que se encontraba en la imagen.
+
+[![Vista Previa del Video 1](https://github.com/David-Ortega-DOS/Challenge_ML_Computer_Vision/blob/main/docs/img/video1.png)](https://drive.google.com/file/d/1xXk-sySnZm4y49EsCp1UZmXdoHEo1BPN/view?usp=drive_link)
 
 
-2. En este video se prueba con otra imagen y se obtienen los marcadores correspondientes a "forklift" y "person" de manera correcta. 
+3. En este video (hacer click en la imagen) se prueba con otra imagen y se obtienen los marcadores correspondientes a "forklift" y "person" de manera correcta. 
 
-- [![Vista Previa del Video 2](https://github.com/David-Ortega-DOS/Challenge_ML_Computer_Vision/blob/main/docs/img/video2.png)](https://drive.google.com/file/d/1sCwvdKYmIZpM4NqKLhucwhhW_cN3qEx9/view?usp=drive_link)
+[![Vista Previa del Video 2](https://github.com/David-Ortega-DOS/Challenge_ML_Computer_Vision/blob/main/docs/img/video2.png)](https://drive.google.com/file/d/1sCwvdKYmIZpM4NqKLhucwhhW_cN3qEx9/view?usp=drive_link)
