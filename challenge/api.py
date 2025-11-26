@@ -42,16 +42,16 @@ try:
         except Exception as e:
             logger.info(f"Failed to load PT: {e}")
             MODEL = None
-    if MODEL is None and ONNX_PATH.exists():
-        try:
-            MODEL = YOLO(str(ONNX_PATH))
-            logger.info("Model loaded: ONNX for fast inference (FALLBACK).")
-        except Exception as e:
-            logger.info(f"Failed to load ONNX: {e}. Discarding ONNX model.")
-            MODEL = None
+    # if MODEL is None and ONNX_PATH.exists():
+    #     try:
+    #         MODEL = YOLO(str(ONNX_PATH))
+    #         logger.info("Model loaded: ONNX for fast inference (FALLBACK).")
+    #     except Exception as e:
+    #         logger.info(f"Failed to load ONNX: {e}. Discarding ONNX model.")
+    #         MODEL = None
 
-    elif MODEL is None:
-        logger.info("[DEBUG] PyTorch (.pt) file not found.")
+    # elif MODEL is None:
+    #     logger.info("[DEBUG] PyTorch (.pt) file not found.")
 
     if MODEL is None:
         raise FileNotFoundError("No valid model artifact could be loaded.")

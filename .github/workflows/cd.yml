@@ -54,4 +54,4 @@ jobs:
         region: ${{ secrets.GCP_REGION }}
         flags: |
           --allow-unauthenticated
-          --memory 1Gi
+          --memory 4Gi
