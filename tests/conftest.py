@@ -5,12 +5,14 @@ import random
 import pytest
 from pathlib import Path
 
-PROJECT_ROOT = Path(__file__).parent.parent 
+PROJECT_ROOT = Path(__file__).parent.parent
 DATA_YAML_PATH = PROJECT_ROOT / "data" / "data.yaml"
 
 
 def _load_data_cfg():
-    assert DATA_YAML_PATH.exists(), f"data.yaml no encontrado en {DATA_YAML_PATH.resolve()}"
+    assert (
+        DATA_YAML_PATH.exists()
+    ), f"data.yaml no encontrado en {DATA_YAML_PATH.resolve()}"
     with open(DATA_YAML_PATH, "r") as f:
         return yaml.safe_load(f)
 
@@ -24,6 +26,7 @@ def _collect_split_images(img_dir: str):
     for ext in ("*.jpg", "*.jpeg", "*.png", "*.bmp"):
         paths.extend(glob.glob(str(full_img_dir / ext)))
     return sorted(paths)
+
 
 def _img_to_label(img_path: str) -> str:
     lbl = img_path.replace(os.sep + "images" + os.sep, os.sep + "labels" + os.sep)
