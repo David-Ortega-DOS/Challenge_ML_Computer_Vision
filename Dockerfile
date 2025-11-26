@@ -12,4 +12,5 @@ COPY ./artifacts /app/artifacts
 
 
 ENV APP_MODULE="challenge.api"
-ENV APP_MODULE_NAME="app"
+
+CMD ["gunicorn", "-k", "uvicorn.workers.UvicornWorker", "challenge.api:app"]
