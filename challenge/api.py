@@ -1,11 +1,9 @@
 import fastapi
-import os
-import json
 from pathlib import Path
 from ultralytics import YOLO
 from fastapi import UploadFile, File, HTTPException
 from fastapi import Form
-from pydantic import BaseModel, Field
+from .schemas import Detection, PredictionResponse
 import numpy as np
 import cv2
 
@@ -63,18 +61,6 @@ except Exception as e:
     CLASSES_META = {"names": ["error"]}
     print(f" Error FATAL al iniciar la API: {e}")
     print("La API se iniciará, pero /predict fallará (Error 503).")
-
-
-class Detection(BaseModel):
-    box: list[float] = Field(description="[x_min, y_min, x_max, y_max] en píxeles")
-    confidence: float = Field(description="Confianza de la detección")
-    class_id: int
-    class_name: str
-
-class PredictionResponse(BaseModel):
-    status: str = "success"
-    num_detections: int
-    detections: list[Detection]
 
 app = fastapi.FastAPI()
 
