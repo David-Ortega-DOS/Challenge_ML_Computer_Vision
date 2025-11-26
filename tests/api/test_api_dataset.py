@@ -49,8 +49,8 @@ def test_api_recall_on_subset(test_images, yolo_labels):
             "/predict",
             files={
                 "file": ("img.jpg", buf, "image/jpeg"),
-                "label": ("label.txt", label_content, "text/plain")
-            }
+                "label": ("label.txt", label_content, "text/plain"),
+            },
         )
 
         assert resp.status_code in (200, 400)
@@ -71,7 +71,7 @@ def test_api_recall_on_subset(test_images, yolo_labels):
                     int(d["box"][0]),  # x_min
                     int(d["box"][1]),  # y_min
                     int(d["box"][2]),  # x_max
-                    int(d["box"][3])   # y_max
+                    int(d["box"][3]),  # y_max
                 )
                 best = max(best, iou_xyxy(bx, gt_xyxy))
             if best >= iou_th:
