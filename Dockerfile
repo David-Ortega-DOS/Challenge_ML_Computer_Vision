@@ -1,15 +1,24 @@
 # syntax=docker/dockerfile:1.2
-FROM tiangolo/uvicorn-gunicorn-fastapi:python3.10
+FROM python:3.10-slim
 
 WORKDIR /app
 
+# Instalar dependencias del sistema
+RUN apt-get update && \
+    apt-get install -y ffmpeg libsm6 libxext6 && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
+
+# Copiar dependencias
 COPY requirements-docker.txt .
-RUN apt-get update && apt-get install ffmpeg libsm6 libxext6  -y
-RUN pip install --no-cache-dir --default-timeout=300 -r requirements-docker.txt
 
-COPY ./challenge /app/challenge
-COPY ./artifacts /app/artifacts
+RUN pip install --no-cache-dir -r requirements-docker.txt
 
+# Copiar el proyecto completo
+COPY . .
 
-ENV APP_MODULE="challenge.api"
-ENV APP_MODULE_NAME="app"
+# Declarar el módulo principal
+ENV APP_MODULE="challenge.api:app"
+
+EXPOSE 8000
+
+CMD ["uvicorn", "challenge.api:app", "--host", "0.0.0.0", "--port", "8000"]
