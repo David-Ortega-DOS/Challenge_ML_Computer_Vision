@@ -1,4 +1,5 @@
 import logging
+import os
 from pathlib import Path
 
 import cv2
@@ -9,6 +10,9 @@ from ultralytics import YOLO
 
 from .schemas import Detection, PredictionResponse
 from .utils import iou_xyxy
+
+# Force PyTorch to use CPU
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 logging.basicConfig(
     level=logging.INFO, format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
